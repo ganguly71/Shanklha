@@ -62,7 +62,7 @@ void take_input()
 {
  if (input())
  {
-    cahr c = getchar();
+    char c = getchar();
     switch (c)
     {
         case 'w':
