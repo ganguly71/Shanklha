@@ -2,7 +2,7 @@
 #include <stdlib.h> /*to yse system function*/
 #include <termios.h> /* to change the properties of the console*/
 #include <unistd.h>
-#include <time.h.> /* to have the random function*/
+#include <time.h> /* to have the random function*/
 
 /* to make the pitch*/
 #define HEIGHT 20
@@ -21,11 +21,9 @@ void take_input();
 
 /* possible directions*/
 enum Arrow
-{
-    Up, Down, Left, Right, Stop
-};
+{Up, Down, Left, Right, Stop};
+enum Arrow direction;
 
-enum Arrow direction
 /* all the intezers */
 int a = 0;
 int x_O, y_O;
@@ -43,6 +41,7 @@ int main()
     while(1)
     {
      draw();
+     take_input();
      move();
      int sleep = 300000/(a!=0 ? a:10);
      usleep (sleep);
@@ -56,31 +55,31 @@ int input()
   struct timeval tv = { 0L, 0L };
   fd_set fds;
   FD_SET(0, &fds);
-  retirn select(1, &fds, NULL, NULL, &tv);
+  return select(1, &fds, NULL, NULL, &tv);
 }
 
 void take_input()
 {
  if (input())
  {
-    cahr c = getc();
+    cahr c = getchar();
     switch (c)
     {
         case 'w':
-           direction= Up;
-        break;
+            direction= Up;
+            break;
         case 's':
-        direction = Down;
-        break;
+            direction = Down;
+            break;
         case 'a':
-        direction = Left;
-        break;
+            direction = Left;
+            break;
         case 'd':
-        direction = Right;
-        break;
+            direction = Right;
+            break;
         case 'q':
-        exit (0);
-        break;
+            exit (0);
+            break;
     }
  }
 }
@@ -92,34 +91,38 @@ void draw()
 
     for (int i=0;i<WIDTH+2; i++) /* it will print the horizontal boundary*/
        printf ("=");
+       printf("\n");
         
     for (int i=0;i<HEIGHT+2; i++)/* it will print the vertical boundary*/
     { 
-    printf("\n||");
-    for (int j=0;j<WIDTH+2; j++) /* it will print the grid*/
-    {
-    if (i == y_matha && j == x_matha)
-     printf("M"); 
-    if (i == y_O && j == x_O)
-     printf("<$>");
-     else
-     { 
-        int got = 0;
-        for( int h = 0; h<tail; h++)
-        {
-            if (tail_location_x[k] == j && tail_location_y[k] == i)
-            printf ("~");
+        printf("\n||");
+        for (int j=0;j<WIDTH+2; j++) /* it will print the grid*/
+       {
+            if (i == y_matha && j == x_matha)
+            printf("M"); 
+            if (i == y_O && j == x_O)
+            printf("<$>");
+           else
+         { 
+              int got = 0;
+               for( int h = 0; h<tail; h++)
+            {
+               if (tail_location_x[h] == j && tail_location_y[h] == i)
+              printf ("~");
+               got =1;
+               break;
+            }
+               if (!got)
+                printf(" ");
+         }
         }
-        if (!got)
-     printf(" ");
-     }
-    }
-    printf("||");
+       printf("||\n");
     }
 
-     printf ("\n");
+
     for (int i=0;i<WIDTH+2; i++) /* it will print the horizontal boundary*/
     printf ("=");  
+    printf("\n");
 
        printf("\nPOINTS- %d",a);
 }
@@ -140,10 +143,11 @@ void assign()
 void move()
 {
     int x = x_matha, y = y_matha;
+    int x1, y1;
     for (int i = tail-1; i>1; i--)
     {
-        tail_location_x[1] = tail_location_x[i-1];
-        tail_location_y[1] = tail_location_y[i-1];
+        tail_location_x[i] = tail_location_x[i-1];
+        tail_location_y[i] = tail_location_y[i-1];
     }
 tail_location_x[0] = x_matha;
 tail_location_y[0] = y_matha;
@@ -154,7 +158,7 @@ tail_location_y[0] = y_matha;
     y_matha--;
     break;
     case Down:
-    xymatha++;
+    y_matha++;
     break;
     case Left:
     x_matha--;
@@ -165,27 +169,31 @@ tail_location_y[0] = y_matha;
     case Stop:/* stops automatically */
     break;
  }
+ /* to continue through the walls*/
   if (x_matha<0)
   x_matha= WIDTH-1;
  
-  else ( x_matha>= WIDTH)
+  else if ( x_matha>= WIDTH)
   x_matha = 0;
 
   if (y_matha<0)
   y_matha = HEIGHT-1;
+
   else if (y_matha>= HEIGHT)
   y_matha=0;
 
+  /* if collided with the tail */
 for (int i = 0; i<tail; i++)
 {
     if (x_matha == tail_location_x[i] && y_matha == tail_location_y[i])
     {
-        printf("Game Done");
+        printf("Game Done\n");
     
     exit (0);
     }
 }
-
+ 
+/*grabed the fruit*/
   if (x_matha== x_O && y_matha==y_O)
   {
   a = a + 9;
