@@ -29,12 +29,13 @@ int a = 0;
 int x_O, y_O;
 int x_matha, y_matha;
 int tail;
-int tail_location_x[3267];
-int tail_location_y[3267];
+int tail_location_x[100];
+int tail_location_y[100];
 
 /* Execution */
 int main()
 {
+    void clear_screen();
     srand(time(NULL)); /* randomizes the locatuion of the fruit */
     set_terminal();
     assign(); // this will assign value to the intezers at the start
@@ -43,7 +44,7 @@ int main()
      draw();
      take_input();
      move();
-     int sleep = 300000/(a!=0 ? a:10);
+     int sleep = 30000/(a!=0 ? a:10);
      usleep (sleep);
     }
 }
@@ -100,7 +101,7 @@ void draw()
        {
             if (i == y_matha && j == x_matha)
             printf("M"); 
-            if (i == y_O && j == x_O)
+            else if (i == y_O && j == x_O)
             printf("<$>");
            else
          { 
@@ -144,7 +145,7 @@ void move()
 {
     int x = x_matha, y = y_matha;
     int x1, y1;
-    for (int i = tail-1; i>1; i--)
+    for (int i = tail-1; i>0; i--)
     {
         tail_location_x[i] = tail_location_x[i-1];
         tail_location_y[i] = tail_location_y[i-1];
@@ -197,7 +198,10 @@ for (int i = 0; i<tail; i++)
   if (x_matha== x_O && y_matha==y_O)
   {
   a = a + 9;
-  tail ++;
+  if (tail < 3267)
+    tail++;
+   
+
   x_O= rand ()% WIDTH;
   y_O = rand ()% HEIGHT;
   }
@@ -209,7 +213,7 @@ void set_terminal()
     tcgetattr(STDIN_FILENO, &old_props);
     atexit(reset); /* calls restet automatically */
     struct termios new_props = old_props;
-    new_props.c_lflag= ~(ECHO | ICANON); /* Echo shows the input, Icanon give the input to the terminal, here we turned off both*/
+    new_props.c_lflag &= ~(ECHO | ICANON); /* Echo shows the input, Icanon give the input to the terminal, here we turned off both*/
     tcsetattr(STDIN_FILENO, TCSANOW, &new_props);
 }
 
@@ -220,7 +224,7 @@ void reset()
 
 void clear_screen()
 {
- #ifdef _Win32
+ #ifdef _WIN32
  system("cls"); /*for wondows*/
  #else
  system( "clear" ); /*for unix/linux/mac*/
